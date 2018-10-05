@@ -1,17 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.martin.tigerdb.model;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import org.martin.electroList.structure.ElectroList;
-import org.martin.lion.exceptions.UnknownFieldException;
-import org.martin.lion.store.StoreManager;
-import org.martin.lion.system.SysInfo;
+import java.util.List;
 
 /**
  *
@@ -135,7 +127,7 @@ public class Table<T>{
         return storeManager.getAvgBy(fieldName);
     }
     
-    public ElectroList<T> selectAll(){
+    public List<T> selectAll(){
         return storeManager.getObjects();
     }
 
@@ -159,9 +151,9 @@ public class Table<T>{
         return storeManager.getFirstObjectBy(fieldName, valueToFind);
     }
     
-    public ElectroList<T> getObjectsBy(String fieldName, Object valueToFind) 
+    public List<T> getObjectsBy(String fieldName, Object valueToFind) 
             throws IllegalArgumentException, IllegalAccessException {
-        return storeManager.getObjectsBy(fieldName, valueToFind);
+        return null;
     }
     
     public void update(int index, T newObject) throws IOException{

@@ -1,19 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.martin.tigerdb.model;
 
 import org.martin.tigerdb.exceptions.IncompatibleObjectTypeException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.martin.electroList.structure.ElectroList;
-import org.martin.lion.exceptions.UnknownFieldException;
-import org.martin.lion.system.SysInfo;
 import org.martin.tigerdb.exceptions.TableAlreadyExistsException;
 import org.martin.tigerdb.exceptions.UnknownTableException;
 
@@ -24,7 +18,7 @@ import org.martin.tigerdb.exceptions.UnknownTableException;
 public class Database {
     private String name;
     private File dbFolder;
-    private final ElectroList<Table> tables = new ElectroList<>();
+    private final List<Table> tables = new ArrayList<>();
 
     /**
      * Constructor de clase Database, recibe el nombre de ésta como parámetro
@@ -34,7 +28,7 @@ public class Database {
      */
     public Database(String name) {
         this.name = name;
-        dbFolder = new File(SysInfo.ROOT_DIR, name);
+        dbFolder = new File(name);
         if(!dbFolder.exists())
             dbFolder.mkdir();
         loadDB();
@@ -74,7 +68,7 @@ public class Database {
      * @return true si la tabla existe; false en caso contrario.
      */
     public boolean hasTable(String tblName){
-        return tables.anyMatch(t->t.getName().equals(tblName));
+        return tables.stream().anyMatch((tab) -> (tab.getName().equalsIgnoreCase(tblName)));
     }
     
     /**
@@ -125,11 +119,14 @@ public class Database {
      * @param tblName Nombre de la tabla a buscar.
      * @return Objeto Table con los datos de la tabla si es que existe, sino null.
      */
-    public Table getTable(String tblName){
-        Table tbl = tables.findFirst(t->t.getName().equals(tblName));
-        if (tbl == null)
-            throw new UnknownTableException(tblName);
-        return tbl;
+    public Table getTable(String tblName) throws UnknownTableException{
+        for (Table tab : tables) {
+            if(tab.getName().equalsIgnoreCase(tblName)){
+                return tab;
+            }
+        }
+        
+        throw new UnknownTableException();
     }
     
     /**
@@ -281,7 +278,7 @@ public class Database {
         return tbl.selectBy(index);
     }
     
-    public ElectroList selectAllFrom(String tblName){
+    public List selectAllFrom(String tblName){
         Table tbl = getTable(tblName);
         return tbl.selectAll();
     }
@@ -296,7 +293,7 @@ public class Database {
         return tbl.selectLast();
     }
         
-    public ElectroList selectFrom(String tblName, String fieldName, Object valueToFind) {
+    public List selectFrom(String tblName, String fieldName, Object valueToFind) {
         try {
             Table tbl = getTable(tblName);
             return tbl.getObjectsBy(fieldName, valueToFind);
@@ -360,7 +357,7 @@ public class Database {
         try {
             Table tbl = getTable(tblName);
             tbl.deleteBy(fieldName, valueToFind);
-        } catch (UnknownFieldException | IllegalArgumentException | IllegalAccessException | IOException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException | IOException ex) {
             Logger.getLogger(Database.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
